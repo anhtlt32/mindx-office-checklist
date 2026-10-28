@@ -133,17 +133,17 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 <div class="notice" style="margin-top:14px">Danh sách được nhập từ file địa điểm MindX cung cấp; không đồng nghĩa tất cả cơ sở đang còn chỗ hoặc cung cấp gói giờ hành chính. Bản đồ Google tra cứu theo địa chỉ, chưa phải bộ tọa độ GPS đã xác minh. Cơ sở Lê Văn Việt chưa có link Google Maps trong dữ liệu gốc.</div>
 <div class="ctastrip no-print"><div class="kicker" style="color:#ff969a">MINDX LOCATION MATCH</div><h3 style="font-size:25px;margin:8px 0">Bạn muốn tìm một văn phòng thuận tiện hơn?</h3><p>Gửi khu vực và nhu cầu cho MindX để đội ngũ tư vấn cơ sở phù hợp với lịch làm việc, quy mô và ngân sách.</p><button class="btn" data-consult="map">Nhận tư vấn</button></div></div>
 </section>
-<section class="block" id="consult"><h2 class="heading">05. Nhận tư vấn từ MindX Startup Space</h2><p class="sub">Không cần nhập lại những gì bạn đã đánh giá. Chúng mình sẽ chuẩn bị một bản tóm tắt nhu cầu để bạn gửi cho đội ngũ tư vấn.</p>
-<div class="card"><form id="leadForm" method="post">
+<section class="block" id="consult"><h2 class="heading">05. Nhận tư vấn từ MindX Startup Space</h2><p class="sub">Để lại thông tin để MindX Startup Space liên hệ tư vấn theo kết quả đánh giá của bạn.</p>
+<div class="card"><form id="leadForm" novalidate>
 <div class="grid2"><div class="field"><label for="leadName">Họ tên *</label><input id="leadName" autocomplete="name" required placeholder="Tên người liên hệ"></div>
 <div class="field"><label for="leadPhone">Số điện thoại *</label><input id="leadPhone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09xxxxxxxx"></div>
 <div class="field"><label for="leadArea">Khu vực mong muốn *</label><input id="leadArea" required placeholder="VD: Bình Thạnh, TP.HCM"></div>
 <div class="field"><label for="leadSeats">Số chỗ ngồi cần tư vấn</label><input id="leadSeats" type="number" min="1" placeholder="VD: 10"></div></div>
 <div class="field" style="margin-top:16px"><label for="leadNote">Nhu cầu bổ sung</label><textarea id="leadNote" rows="3" placeholder="Giờ hành chính, khu vực ưu tiên, thời điểm cần sử dụng..."></textarea></div>
 <label style="display:flex;gap:9px;margin:15px 0;font-size:13px"><input type="checkbox" id="consent" required style="accent-color:var(--r);align-self:flex-start;margin-top:5px"><span>Tôi đồng ý cung cấp thông tin trên để đội ngũ MindX liên hệ tư vấn. Thông tin của tôi sẽ được gửi tới MindX để phục vụ việc tư vấn.</span></label>
-<div class="actions no-print"><button class="btn" id="submitLead" type="submit">Nhận tư vấn</button></div>
+<div class="actions no-print"><button class="btn" id="submitLead" type="button">Nhận tư vấn</button></div>
 <div class="formstatus" id="formStatus" aria-live="polite" style="margin-top:15px"></div>
-</form><p class="muted">Thông tin bạn cung cấp được dùng để MindX liên hệ theo yêu cầu tư vấn. Sau khi gửi, vui lòng chờ xác nhận từ đội ngũ MindX.</p>
+</form><script>document.getElementById("leadForm").addEventListener("submit", function(e){e.preventDefault()});</script><p class="muted">Thông tin bạn cung cấp được dùng để MindX liên hệ theo yêu cầu tư vấn. Sau khi gửi, vui lòng chờ xác nhận từ đội ngũ MindX.</p>
 </div></section>
 
 </main>
@@ -353,7 +353,8 @@ async function prepareLead(){
    $('submitLead').disabled = false;
  }
 }
-$('leadForm').onsubmit=e=>{e.preventDefault();prepareLead()};
+$('submitLead').addEventListener('click',prepareLead);
+$('leadForm').addEventListener('submit',e=>{e.preventDefault();prepareLead()});
 let observed=false;const observer=new IntersectionObserver(entries=>{if(entries.some(x=>x.isIntersecting)){observed=true;$('mobilecta').hidden=false;observer.disconnect()}},{threshold:.25});observer.observe($('audit'));
 renderCosts();renderQuestions();update();
 })();
