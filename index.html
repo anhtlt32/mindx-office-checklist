@@ -73,6 +73,8 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 @media(max-width:900px){.hero-copy{grid-template-columns:1fr;gap:0}.hero-copy>:not(.hero-art),.hero-copy .hero-art{grid-column:1}.hero-copy .hero-art{grid-row:auto;max-width:620px;margin:22px 0 4px}}
 @media(max-width:600px){.proof-head{display:block}.proof-head p{margin-top:8px}.space-proof{padding-top:28px}.space-set{flex-basis:2700px;width:2700px;height:430px}.space-card{border-width:4px;border-radius:17px}.space-card:nth-child(1){left:0;top:40px;width:410px;height:320px}.space-card:nth-child(2){left:360px;top:0;width:300px;height:200px}.space-card:nth-child(3){left:620px;top:190px;width:350px;height:220px}.space-card:nth-child(4){left:920px;top:30px;width:410px;height:290px}.space-card:nth-child(5){left:1270px;top:235px;width:270px;height:180px}.space-card:nth-child(6){left:1490px;top:15px;width:320px;height:220px}.space-card:nth-child(7){left:1770px;top:180px;width:420px;height:230px}.space-card:nth-child(8){left:2140px;top:25px;width:300px;height:190px}.space-card:nth-child(9){left:2360px;top:205px;width:330px;height:210px}.space-track{animation-duration:95s}.wizard-visual{aspect-ratio:4/3;border-radius:13px}.wizard-question{min-height:auto}}
 @media(prefers-reduced-motion:reduce){.space-marquee{overflow-x:auto;mask-image:none;-webkit-mask-image:none;scroll-snap-type:x mandatory}.space-track{animation:none;transform:none}.space-set[aria-hidden="true"]{display:none}.space-card{scroll-snap-align:center}.space-card img{transition:none}}
+
+.mindx-modal[hidden]{display:none!important}.mindx-modal{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,22,29,.58);backdrop-filter:blur(4px)}.mindx-modal-dialog{position:relative;width:min(100%,480px);background:#fff;border-radius:22px;padding:38px 30px 30px;text-align:center;box-shadow:0 30px 100px #0003}.mindx-modal-mark{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 20px;border-radius:50%;background:#fff0f1;color:#e31f26;font-size:34px;font-weight:850}.mindx-modal-dialog h2{font-size:clamp(25px,4vw,32px);margin:0 0 12px;letter-spacing:-.5px}.mindx-modal-dialog p{font-size:16px;color:#505964;line-height:1.6;margin:0 0 25px}.mindx-modal-dialog .btn{min-width:145px}.mindx-modal-close{position:absolute;top:12px;right:13px;border:0;background:transparent;color:#66717b;font-size:26px;line-height:1;padding:6px 10px}
 </style>
 </head>
 <body>
@@ -294,6 +296,7 @@ function leadSummary(){let c=costs(),findings=getFindings();return [
 'Khách hàng đồng ý được liên hệ để tư vấn.'].join('\n')}
 function checkForm(){return $('leadForm').reportValidity()&&/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,''))}
 function status(t){$('formStatus').textContent=t;$('formStatus').classList.add('show')}
+function openThanksPopup(){const m=$('mindxThankYou');m.hidden=false;$('mindxThanksOK').focus()}function closeThanksPopup(){$('mindxThankYou').hidden=true;$('submitLead').focus()}$('mindxThanksOK').addEventListener('click',closeThanksPopup);$('mindxThanksClose').addEventListener('click',closeThanksPopup);$('mindxThankYou').addEventListener('click',e=>{if(e.target===e.currentTarget)closeThanksPopup()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('mindxThankYou').hidden)closeThanksPopup()});
 const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzNVOvYriQgCkunr9BHoAbOYfi5IXGHk1FRPgvFx69HWRin27vPl1FL05ggOQbfkg-7Iw/exec';
 let submittingLead = false;
 function leadPayload(){
@@ -341,7 +344,7 @@ async function prepareLead(){
      headers:{'Content-Type':'text/plain;charset=utf-8'},
      body:JSON.stringify(leadPayload())
    });
-   status('Yêu cầu đã được chuyển tới hệ thống tiếp nhận. Hiện chưa thể xác nhận tự động đã lưu vào Google Sheets; MindX sẽ liên hệ khi nhận được thông tin.');
+   $('formStatus').classList.remove('show');openThanksPopup();
  } catch (error) {
    console.error('Lead transport error:',error);
    status('Không thể kết nối để gửi yêu cầu. Vui lòng kiểm tra mạng và thử lại.');
@@ -355,4 +358,5 @@ let observed=false;const observer=new IntersectionObserver(entries=>{if(entries.
 renderCosts();renderQuestions();update();
 })();
 </script>
+<div class="mindx-modal" id="mindxThankYou" role="dialog" aria-modal="true" aria-labelledby="mindxThanksTitle" aria-describedby="mindxThanksDesc" hidden><div class="mindx-modal-dialog"><button type="button" class="mindx-modal-close" id="mindxThanksClose" aria-label="Đóng">×</button><div class="mindx-modal-mark" aria-hidden="true">✓</div><h2 id="mindxThanksTitle">Cảm ơn quý khách!</h2><p id="mindxThanksDesc">MindX Startup Space sẽ liên hệ quý khách trong thời gian sớm nhất.</p><button type="button" class="btn" id="mindxThanksOK">Đóng</button></div></div>
 </body></html>
