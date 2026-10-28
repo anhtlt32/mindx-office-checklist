@@ -40,6 +40,7 @@ section.block{padding:46px 0}.heading{font-size:clamp(26px,3vw,35px);line-height
 .location b{display:block}.location small{color:var(--muted);display:block;margin:6px 0}.location a{color:var(--r);font-weight:750;font-size:13px}.tag{display:inline-block;background:#eef2f4;color:#55606b;border-radius:8px;padding:4px 8px;font-size:12px}
 .notice{background:#fff8e9;border:1px solid #f5deb0;padding:13px 16px;border-radius:11px;color:#655438;font-size:13px}
 .formstatus{padding:12px;border-radius:9px;background:#f3f4f5;color:#515962;display:none}.formstatus.show{display:block}
+.thanks-modal[hidden]{display:none}.thanks-modal{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:20px}.thanks-backdrop{position:absolute;inset:0;background:#111820b8;backdrop-filter:blur(5px)}.thanks-dialog{position:relative;width:min(100%,470px);padding:38px 34px 32px;border-radius:24px;background:#fff;text-align:center;box-shadow:0 28px 80px #0005;animation:thanksIn .28s ease-out}.thanks-icon{width:62px;height:62px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:#fff0f1;color:var(--r);font-size:30px;font-weight:900}.thanks-dialog h2{margin:0 0 9px;font-size:30px;letter-spacing:-.6px}.thanks-dialog p{margin:0 auto 24px;max-width:350px;color:#59626c;font-size:17px}.thanks-dialog .btn{min-width:150px}@keyframes thanksIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
 footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mobilecta{display:none}
 @media(max-width:800px){.audit-layout{grid-template-columns:1fr}.sticky{position:static}.hero{padding:48px 0}.hero:after{font-size:300px;top:0}.locations{grid-template-columns:1fr}}
 @media(max-width:600px){.container{padding:0 15px}.card{padding:18px}.grid2,.grid3{grid-template-columns:1fr}.hero h1{letter-spacing:-1.6px}.hero p{font-size:16px}.mobilecta{display:block;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:9px 15px;z-index:999;box-shadow:0 -3px 20px #00000014}.mobilecta .btn{width:100%}.mobilecta[hidden]{display:none}}
@@ -73,8 +74,6 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 @media(max-width:900px){.hero-copy{grid-template-columns:1fr;gap:0}.hero-copy>:not(.hero-art),.hero-copy .hero-art{grid-column:1}.hero-copy .hero-art{grid-row:auto;max-width:620px;margin:22px 0 4px}}
 @media(max-width:600px){.proof-head{display:block}.proof-head p{margin-top:8px}.space-proof{padding-top:28px}.space-set{flex-basis:2700px;width:2700px;height:430px}.space-card{border-width:4px;border-radius:17px}.space-card:nth-child(1){left:0;top:40px;width:410px;height:320px}.space-card:nth-child(2){left:360px;top:0;width:300px;height:200px}.space-card:nth-child(3){left:620px;top:190px;width:350px;height:220px}.space-card:nth-child(4){left:920px;top:30px;width:410px;height:290px}.space-card:nth-child(5){left:1270px;top:235px;width:270px;height:180px}.space-card:nth-child(6){left:1490px;top:15px;width:320px;height:220px}.space-card:nth-child(7){left:1770px;top:180px;width:420px;height:230px}.space-card:nth-child(8){left:2140px;top:25px;width:300px;height:190px}.space-card:nth-child(9){left:2360px;top:205px;width:330px;height:210px}.space-track{animation-duration:95s}.wizard-visual{aspect-ratio:4/3;border-radius:13px}.wizard-question{min-height:auto}}
 @media(prefers-reduced-motion:reduce){.space-marquee{overflow-x:auto;mask-image:none;-webkit-mask-image:none;scroll-snap-type:x mandatory}.space-track{animation:none;transform:none}.space-set[aria-hidden="true"]{display:none}.space-card{scroll-snap-align:center}.space-card img{transition:none}}
-
-.mindx-modal[hidden]{display:none!important}.mindx-modal{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,22,29,.58);backdrop-filter:blur(4px)}.mindx-modal-dialog{position:relative;width:min(100%,480px);background:#fff;border-radius:22px;padding:38px 30px 30px;text-align:center;box-shadow:0 30px 100px #0003}.mindx-modal-mark{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 20px;border-radius:50%;background:#fff0f1;color:#e31f26;font-size:34px;font-weight:850}.mindx-modal-dialog h2{font-size:clamp(25px,4vw,32px);margin:0 0 12px;letter-spacing:-.5px}.mindx-modal-dialog p{font-size:16px;color:#505964;line-height:1.6;margin:0 0 25px}.mindx-modal-dialog .btn{min-width:145px}.mindx-modal-close{position:absolute;top:12px;right:13px;border:0;background:transparent;color:#66717b;font-size:26px;line-height:1;padding:6px 10px}
 </style>
 </head>
 <body>
@@ -133,22 +132,23 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 <div class="notice" style="margin-top:14px">Danh sách được nhập từ file địa điểm MindX cung cấp; không đồng nghĩa tất cả cơ sở đang còn chỗ hoặc cung cấp gói giờ hành chính. Bản đồ Google tra cứu theo địa chỉ, chưa phải bộ tọa độ GPS đã xác minh. Cơ sở Lê Văn Việt chưa có link Google Maps trong dữ liệu gốc.</div>
 <div class="ctastrip no-print"><div class="kicker" style="color:#ff969a">MINDX LOCATION MATCH</div><h3 style="font-size:25px;margin:8px 0">Bạn muốn tìm một văn phòng thuận tiện hơn?</h3><p>Gửi khu vực và nhu cầu cho MindX để đội ngũ tư vấn cơ sở phù hợp với lịch làm việc, quy mô và ngân sách.</p><button class="btn" data-consult="map">Nhận tư vấn</button></div></div>
 </section>
-<section class="block" id="consult"><h2 class="heading">05. Nhận tư vấn từ MindX Startup Space</h2><p class="sub">Để lại thông tin để MindX Startup Space liên hệ tư vấn theo kết quả đánh giá của bạn.</p>
-<div class="card"><form id="leadForm" novalidate>
+<section class="block" id="consult"><h2 class="heading">05. Nhận tư vấn từ MindX Startup Space</h2><p class="sub">Không cần nhập lại những gì bạn đã đánh giá. Chúng mình sẽ chuẩn bị một bản tóm tắt nhu cầu để bạn gửi cho đội ngũ tư vấn.</p>
+<div class="card"><form id="leadForm">
 <div class="grid2"><div class="field"><label for="leadName">Họ tên *</label><input id="leadName" autocomplete="name" required placeholder="Tên người liên hệ"></div>
 <div class="field"><label for="leadPhone">Số điện thoại *</label><input id="leadPhone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09xxxxxxxx"></div>
 <div class="field"><label for="leadArea">Khu vực mong muốn *</label><input id="leadArea" required placeholder="VD: Bình Thạnh, TP.HCM"></div>
 <div class="field"><label for="leadSeats">Số chỗ ngồi cần tư vấn</label><input id="leadSeats" type="number" min="1" placeholder="VD: 10"></div></div>
 <div class="field" style="margin-top:16px"><label for="leadNote">Nhu cầu bổ sung</label><textarea id="leadNote" rows="3" placeholder="Giờ hành chính, khu vực ưu tiên, thời điểm cần sử dụng..."></textarea></div>
-<label style="display:flex;gap:9px;margin:15px 0;font-size:13px"><input type="checkbox" id="consent" required style="accent-color:var(--r);align-self:flex-start;margin-top:5px"><span>Tôi đồng ý cung cấp thông tin trên để đội ngũ MindX liên hệ tư vấn. Thông tin của tôi sẽ được gửi tới MindX để phục vụ việc tư vấn.</span></label>
-<div class="actions no-print"><button class="btn" id="submitLead" type="button">Nhận tư vấn</button></div>
+<label style="display:flex;gap:9px;margin:15px 0;font-size:13px"><input type="checkbox" id="consent" required style="accent-color:var(--r);align-self:flex-start;margin-top:5px"><span>Tôi đồng ý cung cấp thông tin trên để đội ngũ MindX liên hệ tư vấn. Tôi hiểu dữ liệu chỉ được gửi khi thực hiện bước chuyển tới kênh tư vấn.</span></label>
+<div class="actions no-print"><button class="btn" type="submit">Nhận tư vấn</button></div>
 <div class="formstatus" id="formStatus" aria-live="polite" style="margin-top:15px"></div>
-</form><script>document.getElementById("leadForm").addEventListener("submit", function(e){e.preventDefault()});</script><p class="muted">Thông tin bạn cung cấp được dùng để MindX liên hệ theo yêu cầu tư vấn. Sau khi gửi, vui lòng chờ xác nhận từ đội ngũ MindX.</p>
+</form><p class="muted">Chưa kết nối CRM/Botcake: form demo này <b>không tự gửi dữ liệu cho MindX</b>. Khi có endpoint bảo mật, có thể tích hợp gửi lead tự động.</p>
 </div></section>
 
 </main>
 <footer><strong>MINDX STARTUP SPACE</strong><br>🤝 Kết nối · Đồng hành · Phát triển<br>📍 40+ cơ sở · 400+ lựa chọn · 🚀 Đồng hành 5.000+ startup/SME</footer>
 <div class="mobilecta no-print" id="mobilecta" hidden><button class="btn" data-consult="mobile">Nhận tư vấn</button></div>
+<div class="thanks-modal no-print" id="thanksModal" hidden><div class="thanks-backdrop" data-close-thanks></div><div class="thanks-dialog" role="dialog" aria-modal="true" aria-labelledby="thanksTitle" aria-describedby="thanksMessage"><div class="thanks-icon" aria-hidden="true">✓</div><h2 id="thanksTitle">Cảm ơn bạn!</h2><p id="thanksMessage">MindX Startup Space sẽ liên hệ trong thời gian sớm nhất.</p><button class="btn" type="button" id="closeThanks">Đóng</button></div></div>
 
 <script>
 (function(){
@@ -296,68 +296,12 @@ function leadSummary(){let c=costs(),findings=getFindings();return [
 'Khách hàng đồng ý được liên hệ để tư vấn.'].join('\n')}
 function checkForm(){return $('leadForm').reportValidity()&&/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,''))}
 function status(t){$('formStatus').textContent=t;$('formStatus').classList.add('show')}
-function openThanksPopup(){const m=$('mindxThankYou');m.hidden=false;$('mindxThanksOK').focus()}function closeThanksPopup(){$('mindxThankYou').hidden=true;$('submitLead').focus()}$('mindxThanksOK').addEventListener('click',closeThanksPopup);$('mindxThanksClose').addEventListener('click',closeThanksPopup);$('mindxThankYou').addEventListener('click',e=>{if(e.target===e.currentTarget)closeThanksPopup()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('mindxThankYou').hidden)closeThanksPopup()});
-const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzNVOvYriQgCkunr9BHoAbOYfi5IXGHk1FRPgvFx69HWRin27vPl1FL05ggOQbfkg-7Iw/exec';
-let submittingLead = false;
-function leadPayload(){
- const u = new URLSearchParams(location.search);
- const c = costs();
- const answers = {};
- flatQuestions.forEach((q, i) => {
-   answers['q' + String(i+1).padStart(2,'0')] = {question:q.question,answer:state.answers[i] || 'unanswered'};
- });
- return {
-   name: $('leadName').value.trim(),
-   phone: $('leadPhone').value.replace(/[\s.-]/g,''),
-   area: $('leadArea').value.trim(),
-   seats: $('leadSeats').value || state.staff || '',
-   note: $('leadNote').value.trim(),
-   totalCost: Math.round(c.total),
-   painPoints: getFindings().map(f=>f.title).join('; '),
-   selectedLocation: state.selectedLocation || state.mapSelected || '',
-   ctaSource: state.source || 'consult_form',
-   answers,
-   utm_source: u.get('utm_source') || '',
-   utm_medium: u.get('utm_medium') || '',
-   utm_campaign: u.get('utm_campaign') || '',
-   utm_content: u.get('utm_content') || '',
-   pageUrl: location.href,
-   consent: $('consent').checked
- };
-}
-async function prepareLead(){
- if (submittingLead) return;
- if(!checkForm()){
-   if($('leadPhone').value&&!/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,'')))status('Vui lòng nhập số điện thoại Việt Nam hợp lệ.');
-   return;
- }
- submittingLead = true;
- $('submitLead').disabled = true;
- status('Đang chuyển yêu cầu tư vấn...');
- try {
-   // Google Apps Script ContentService does not support a readable cross-origin response here.
-   // no-cors sends the POST; a fulfilled request DOES NOT prove the Sheet was updated.
-   await fetch(LEAD_ENDPOINT, {
-     method:'POST',
-     mode:'no-cors',
-     redirect:'follow',
-     headers:{'Content-Type':'text/plain;charset=utf-8'},
-     body:JSON.stringify(leadPayload())
-   });
-   $('formStatus').classList.remove('show');openThanksPopup();
- } catch (error) {
-   console.error('Lead transport error:',error);
-   status('Không thể kết nối để gửi yêu cầu. Vui lòng kiểm tra mạng và thử lại.');
- } finally {
-   submittingLead = false;
-   $('submitLead').disabled = false;
- }
-}
-$('submitLead').addEventListener('click',prepareLead);
-$('leadForm').addEventListener('submit',e=>{e.preventDefault();prepareLead()});
+let thankYouReturnFocus=null;function showThankYou(){thankYouReturnFocus=document.activeElement;$('thanksModal').hidden=false;document.body.style.overflow='hidden';$('closeThanks').focus()}function closeThankYou(){$('thanksModal').hidden=true;document.body.style.overflow='';if(thankYouReturnFocus)thankYouReturnFocus.focus()}
+async function prepareLead(){if(!checkForm()){if($('leadPhone').value&&!/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,'')))status('Vui lòng nhập số điện thoại Việt Nam hợp lệ.');return}await copy(leadSummary());status('Thông tin tư vấn đã được chuẩn bị. Đây là bản demo và chưa tự gửi dữ liệu tới CRM MindX.');showThankYou()}
+$('leadForm').onsubmit=e=>{e.preventDefault();prepareLead()};
+$('closeThanks').onclick=closeThankYou;document.querySelector('[data-close-thanks]').onclick=closeThankYou;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('thanksModal').hidden)closeThankYou()});
 let observed=false;const observer=new IntersectionObserver(entries=>{if(entries.some(x=>x.isIntersecting)){observed=true;$('mobilecta').hidden=false;observer.disconnect()}},{threshold:.25});observer.observe($('audit'));
 renderCosts();renderQuestions();update();
 })();
 </script>
-<div class="mindx-modal" id="mindxThankYou" role="dialog" aria-modal="true" aria-labelledby="mindxThanksTitle" aria-describedby="mindxThanksDesc" hidden><div class="mindx-modal-dialog"><button type="button" class="mindx-modal-close" id="mindxThanksClose" aria-label="Đóng">×</button><div class="mindx-modal-mark" aria-hidden="true">✓</div><h2 id="mindxThanksTitle">Cảm ơn quý khách!</h2><p id="mindxThanksDesc">MindX Startup Space sẽ liên hệ quý khách trong thời gian sớm nhất.</p><button type="button" class="btn" id="mindxThanksOK">Đóng</button></div></div>
 </body></html>
