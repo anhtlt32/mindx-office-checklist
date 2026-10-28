@@ -11,7 +11,7 @@
 html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
 button,input,select,textarea{font:inherit}a{color:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
 .container{max-width:1120px;margin:auto;padding:0 22px}.nav{background:#fff;border-bottom:1px solid var(--line);padding:18px 0}.navflex{display:flex;align-items:center;justify-content:space-between;gap:16px}
-.logo{font-size:30px;font-weight:900;letter-spacing:-1.8px;line-height:1}.logo span{color:var(--r)}.logo small{display:block;letter-spacing:.2px;font-size:11px;text-align:right;font-weight:700}
+.brand-logo{display:block;width:150px;height:auto}.footer-logo{display:block;width:190px;height:auto;margin:0 auto 14px}
 .kicker{color:var(--r);font-weight:800;letter-spacing:1.4px;text-transform:uppercase;font-size:11px}
 .hero{background:#fff;padding:70px 0 62px;position:relative;overflow:hidden}.hero:after{content:"X";font-weight:900;color:#e31f2610;font-size:480px;line-height:1;position:absolute;right:-20px;top:-145px;pointer-events:none}
 .hero .container{position:relative;z-index:1}.hero h1{font-size:clamp(39px,6vw,70px);line-height:1.07;letter-spacing:-2.5px;margin:17px 0 20px;max-width:750px}.hero h1 em{color:var(--r);font-style:normal}
@@ -77,7 +77,7 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 </style>
 </head>
 <body>
-<header class="nav"><div class="container navflex"><div class="logo">mind<span>X</span><small>Startup Space</small></div><span class="muted">OFFICE COST AUDIT · MIỄN PHÍ</span></div></header>
+<header class="nav"><div class="container navflex"><img class="brand-logo" src="assets/mindx-startup-space-logo.png" alt="MindX Startup Space"><span class="muted">OFFICE COST AUDIT · MIỄN PHÍ</span></div></header>
 <section class="hero"><div class="container"><div class="hero-grid"><div class="hero-copy">
 <div class="kicker">MindX Startup Space / Office Cost Optimizer</div>
 <h1><em>Cuối tháng,</em><br>rà lại chi phí văn phòng.</h1>
@@ -142,11 +142,11 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 <label style="display:flex;gap:9px;margin:15px 0;font-size:13px"><input type="checkbox" id="consent" required style="accent-color:var(--r);align-self:flex-start;margin-top:5px"><span>Tôi đồng ý cung cấp thông tin trên để đội ngũ MindX liên hệ tư vấn. Tôi hiểu dữ liệu chỉ được gửi khi thực hiện bước chuyển tới kênh tư vấn.</span></label>
 <div class="actions no-print"><button class="btn" type="submit">Nhận tư vấn</button></div>
 <div class="formstatus" id="formStatus" aria-live="polite" style="margin-top:15px"></div>
-</form><p class="muted">Chưa kết nối CRM/Botcake: form demo này <b>không tự gửi dữ liệu cho MindX</b>. Khi có endpoint bảo mật, có thể tích hợp gửi lead tự động.</p>
+</form><p class="muted">Khi chọn “Nhận tư vấn”, thông tin sẽ được chuyển đến hệ thống tiếp nhận của MindX Startup Space để đội ngũ liên hệ hỗ trợ.</p>
 </div></section>
 
 </main>
-<footer><strong>MINDX STARTUP SPACE</strong><br>🤝 Kết nối · Đồng hành · Phát triển<br>📍 40+ cơ sở · 400+ lựa chọn · 🚀 Đồng hành 5.000+ startup/SME</footer>
+<footer><img class="footer-logo" src="assets/mindx-startup-space-logo.png" alt="MindX Startup Space">🤝 Kết nối · Đồng hành · Phát triển<br>📍 40+ cơ sở · 400+ lựa chọn · 🚀 Đồng hành 5.000+ startup/SME</footer>
 <div class="mobilecta no-print" id="mobilecta" hidden><button class="btn" data-consult="mobile">Nhận tư vấn</button></div>
 <div class="thanks-modal no-print" id="thanksModal" hidden><div class="thanks-backdrop" data-close-thanks></div><div class="thanks-dialog" role="dialog" aria-modal="true" aria-labelledby="thanksTitle" aria-describedby="thanksMessage"><div class="thanks-icon" aria-hidden="true">✓</div><h2 id="thanksTitle">Cảm ơn bạn!</h2><p id="thanksMessage">MindX Startup Space sẽ liên hệ trong thời gian sớm nhất.</p><button class="btn" type="button" id="closeThanks">Đóng</button></div></div>
 
@@ -154,6 +154,9 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
+const LEAD_ENDPOINT='https://script.google.com/macros/s/AKfycbzNVOvYriQgCkunr9BHoAbOYfi5IXGHk1FRPgvFx69HWRin27vPl1FL05ggOQbfkg-7Iw/exec';
+let pendingRequestId=null;
+let isSendingLead=false;
 const spaceSet=document.querySelector('.space-set');if(spaceSet){const clone=spaceSet.cloneNode(true);clone.setAttribute('aria-hidden','true');clone.querySelectorAll('img').forEach(img=>{img.alt='';img.loading='lazy'});spaceSet.after(clone)}
 const groups=[
 {title:'Chi phí văn phòng',qs:[
@@ -297,7 +300,46 @@ function leadSummary(){let c=costs(),findings=getFindings();return [
 function checkForm(){return $('leadForm').reportValidity()&&/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,''))}
 function status(t){$('formStatus').textContent=t;$('formStatus').classList.add('show')}
 let thankYouReturnFocus=null;function showThankYou(){thankYouReturnFocus=document.activeElement;$('thanksModal').hidden=false;document.body.style.overflow='hidden';$('closeThanks').focus()}function closeThankYou(){$('thanksModal').hidden=true;document.body.style.overflow='';if(thankYouReturnFocus)thankYouReturnFocus.focus()}
-async function prepareLead(){if(!checkForm()){if($('leadPhone').value&&!/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,'')))status('Vui lòng nhập số điện thoại Việt Nam hợp lệ.');return}await copy(leadSummary());status('Thông tin tư vấn đã được chuẩn bị. Đây là bản demo và chưa tự gửi dữ liệu tới CRM MindX.');showThankYou()}
+async function prepareLead(){
+if(!checkForm()||isSendingLead)return;
+const params=new URLSearchParams(location.search);
+const c=costs();
+if(!pendingRequestId)pendingRequestId=crypto.randomUUID();
+const payload={
+requestId:pendingRequestId,
+name:$('leadName').value.trim(),
+phone:$('leadPhone').value.trim(),
+area:$('leadArea').value.trim(),
+seats:$('leadSeats').value||state.staff,
+note:$('leadNote').value.trim(),
+totalCost:c.total,
+painPoints:getFindings().map(f=>f.title),
+selectedLocation:state.selectedLocation||'',
+ctaSource:state.source,
+answers:state.answers,
+utm_source:params.get('utm_source')||'',
+utm_medium:params.get('utm_medium')||'',
+utm_campaign:params.get('utm_campaign')||'',
+utm_content:params.get('utm_content')||'',
+pageUrl:location.href,
+consent:$('consent').checked
+};
+isSendingLead=true;
+const button=$('leadForm').querySelector('button[type="submit"]');
+button.disabled=true;
+button.textContent='Đang gửi...';
+try{
+await fetch(LEAD_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+status('Đã gửi yêu cầu. Hệ thống chưa xác nhận được việc lưu dữ liệu.');
+showThankYou();
+}catch(err){
+status('Không thể gửi yêu cầu. Vui lòng thử lại.');
+}finally{
+isSendingLead=false;
+button.disabled=false;
+button.textContent='Nhận tư vấn';
+}
+}
 $('leadForm').onsubmit=e=>{e.preventDefault();prepareLead()};
 $('closeThanks').onclick=closeThankYou;document.querySelector('[data-close-thanks]').onclick=closeThankYou;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('thanksModal').hidden)closeThankYou()});
 let observed=false;const observer=new IntersectionObserver(entries=>{if(entries.some(x=>x.isIntersecting)){observed=true;$('mobilecta').hidden=false;observer.disconnect()}},{threshold:.25});observer.observe($('audit'));
