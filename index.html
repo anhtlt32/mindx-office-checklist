@@ -132,16 +132,16 @@ footer{text-align:center;padding:36px 16px 92px;color:#687078;font-size:13px}.mo
 <div class="ctastrip no-print"><div class="kicker" style="color:#ff969a">MINDX LOCATION MATCH</div><h3 style="font-size:25px;margin:8px 0">Bạn muốn tìm một văn phòng thuận tiện hơn?</h3><p>Gửi khu vực và nhu cầu cho MindX để đội ngũ tư vấn cơ sở phù hợp với lịch làm việc, quy mô và ngân sách.</p><button class="btn" data-consult="map">Nhận tư vấn</button></div></div>
 </section>
 <section class="block" id="consult"><h2 class="heading">05. Nhận tư vấn từ MindX Startup Space</h2><p class="sub">Không cần nhập lại những gì bạn đã đánh giá. Chúng mình sẽ chuẩn bị một bản tóm tắt nhu cầu để bạn gửi cho đội ngũ tư vấn.</p>
-<div class="card"><form id="leadForm">
+<div class="card"><form id="leadForm" method="post">
 <div class="grid2"><div class="field"><label for="leadName">Họ tên *</label><input id="leadName" autocomplete="name" required placeholder="Tên người liên hệ"></div>
 <div class="field"><label for="leadPhone">Số điện thoại *</label><input id="leadPhone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="09xxxxxxxx"></div>
 <div class="field"><label for="leadArea">Khu vực mong muốn *</label><input id="leadArea" required placeholder="VD: Bình Thạnh, TP.HCM"></div>
 <div class="field"><label for="leadSeats">Số chỗ ngồi cần tư vấn</label><input id="leadSeats" type="number" min="1" placeholder="VD: 10"></div></div>
 <div class="field" style="margin-top:16px"><label for="leadNote">Nhu cầu bổ sung</label><textarea id="leadNote" rows="3" placeholder="Giờ hành chính, khu vực ưu tiên, thời điểm cần sử dụng..."></textarea></div>
-<label style="display:flex;gap:9px;margin:15px 0;font-size:13px"><input type="checkbox" id="consent" required style="accent-color:var(--r);align-self:flex-start;margin-top:5px"><span>Tôi đồng ý cung cấp thông tin trên để đội ngũ MindX liên hệ tư vấn. Tôi hiểu dữ liệu chỉ được gửi khi thực hiện bước chuyển tới kênh tư vấn.</span></label>
-<div class="actions no-print"><button class="btn" type="submit">Nhận tư vấn</button></div>
+<label style="display:flex;gap:9px;margin:15px 0;font-size:13px"><input type="checkbox" id="consent" required style="accent-color:var(--r);align-self:flex-start;margin-top:5px"><span>Tôi đồng ý cung cấp thông tin trên để đội ngũ MindX liên hệ tư vấn. Thông tin của tôi sẽ được gửi tới MindX để phục vụ việc tư vấn.</span></label>
+<div class="actions no-print"><button class="btn" id="submitLead" type="submit">Nhận tư vấn</button></div>
 <div class="formstatus" id="formStatus" aria-live="polite" style="margin-top:15px"></div>
-</form><p class="muted">Chưa kết nối CRM/Botcake: form demo này <b>không tự gửi dữ liệu cho MindX</b>. Khi có endpoint bảo mật, có thể tích hợp gửi lead tự động.</p>
+</form><p class="muted">Thông tin bạn cung cấp được dùng để MindX liên hệ theo yêu cầu tư vấn. Sau khi gửi, vui lòng chờ xác nhận từ đội ngũ MindX.</p>
 </div></section>
 
 </main>
@@ -294,7 +294,62 @@ function leadSummary(){let c=costs(),findings=getFindings();return [
 'Khách hàng đồng ý được liên hệ để tư vấn.'].join('\n')}
 function checkForm(){return $('leadForm').reportValidity()&&/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,''))}
 function status(t){$('formStatus').textContent=t;$('formStatus').classList.add('show')}
-async function prepareLead(){if(!checkForm()){if($('leadPhone').value&&!/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,'')))status('Vui lòng nhập số điện thoại Việt Nam hợp lệ.');return}await copy(leadSummary());status('Thông tin tư vấn đã được chuẩn bị. Đây là bản demo và chưa tự gửi dữ liệu tới CRM MindX.')}
+const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzNVOvYriQgCkunr9BHoAbOYfi5IXGHk1FRPgvFx69HWRin27vPl1FL05ggOQbfkg-7Iw/exec';
+let submittingLead = false;
+function leadPayload(){
+ const u = new URLSearchParams(location.search);
+ const c = costs();
+ const answers = {};
+ flatQuestions.forEach((q, i) => {
+   answers['q' + String(i+1).padStart(2,'0')] = {question:q.question,answer:state.answers[i] || 'unanswered'};
+ });
+ return {
+   name: $('leadName').value.trim(),
+   phone: $('leadPhone').value.replace(/[\s.-]/g,''),
+   area: $('leadArea').value.trim(),
+   seats: $('leadSeats').value || state.staff || '',
+   note: $('leadNote').value.trim(),
+   totalCost: Math.round(c.total),
+   painPoints: getFindings().map(f=>f.title).join('; '),
+   selectedLocation: state.selectedLocation || state.mapSelected || '',
+   ctaSource: state.source || 'consult_form',
+   answers,
+   utm_source: u.get('utm_source') || '',
+   utm_medium: u.get('utm_medium') || '',
+   utm_campaign: u.get('utm_campaign') || '',
+   utm_content: u.get('utm_content') || '',
+   pageUrl: location.href,
+   consent: $('consent').checked
+ };
+}
+async function prepareLead(){
+ if (submittingLead) return;
+ if(!checkForm()){
+   if($('leadPhone').value&&!/^0\d{9,10}$/.test($('leadPhone').value.replace(/[\s.-]/g,'')))status('Vui lòng nhập số điện thoại Việt Nam hợp lệ.');
+   return;
+ }
+ submittingLead = true;
+ $('submitLead').disabled = true;
+ status('Đang chuyển yêu cầu tư vấn...');
+ try {
+   // Google Apps Script ContentService does not support a readable cross-origin response here.
+   // no-cors sends the POST; a fulfilled request DOES NOT prove the Sheet was updated.
+   await fetch(LEAD_ENDPOINT, {
+     method:'POST',
+     mode:'no-cors',
+     redirect:'follow',
+     headers:{'Content-Type':'text/plain;charset=utf-8'},
+     body:JSON.stringify(leadPayload())
+   });
+   status('Yêu cầu đã được chuyển tới hệ thống tiếp nhận. Hiện chưa thể xác nhận tự động đã lưu vào Google Sheets; MindX sẽ liên hệ khi nhận được thông tin.');
+ } catch (error) {
+   console.error('Lead transport error:',error);
+   status('Không thể kết nối để gửi yêu cầu. Vui lòng kiểm tra mạng và thử lại.');
+ } finally {
+   submittingLead = false;
+   $('submitLead').disabled = false;
+ }
+}
 $('leadForm').onsubmit=e=>{e.preventDefault();prepareLead()};
 let observed=false;const observer=new IntersectionObserver(entries=>{if(entries.some(x=>x.isIntersecting)){observed=true;$('mobilecta').hidden=false;observer.disconnect()}},{threshold:.25});observer.observe($('audit'));
 renderCosts();renderQuestions();update();
